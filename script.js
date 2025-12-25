@@ -3,10 +3,19 @@
 let secretNumber = 0;
 // ตัวแปรนับจํานวนครั้งที่ทาย
 let attemptCount = 0;
+// ตัวแปรสำหรับ Timer
+let timeLeft = 30; // เวลาที่เหลือ
+let timerId = null;
+
 // ฟังก์ชันเริ่มเกมใหม่
 function initializeGame() {
   secretNumber = Math.floor(Math.random() * 100) + 1;
   attemptCount = 0;
+  // เปิด input ทุกครั้งที่เริ่มเกม
+  document.getElementById("guessInput").disabled = false;
+
+  // เริ่มจับเวลา
+  startTimer();
   updateDisplay();
 }
 
@@ -36,6 +45,8 @@ function checkGuess() {
   }
   attemptCount++;
   if (guessValue === secretNumber) {
+    clearInterval(timerId); // หยุด Timer เมื่อทายถูก
+    guessInput.disabled = true; // ปิด input ไม่ให้ทายต่อ
     resultContainer.innerHTML = `
  <div class="alert alert-success" role="alert">
  <h5>✓ ถูกต้อง!</h5>
@@ -65,7 +76,6 @@ function updateDisplay() {
   const attemptsContainer = document.getElementById("attemptsContainer");
   attemptsContainer.textContent = `ทายแล้ว: ${attemptCount} ครั้ง`;
 }
-// ...existing code..
 // ฟังก์ชันเริ่มเกมใหม่
 function resetGame() {
   initializeGame();
@@ -73,7 +83,6 @@ function resetGame() {
   document.getElementById("guessInput").value = "";
   document.getElementById("guessInput").focus();
 }
-// ...existing code..
 // เริ่มเกมเมื่อโหลดหน้า
 window.addEventListener("load", initializeGame);
 // เพิ่มการ select text เมื่อคลิก input
@@ -94,3 +103,35 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 });
+// ฟังก์ชันเริ่มจับเวลา
+function startTimer() {
+  clearInterval(timerId); // เคลียร์ timer เดิม
+  timeLeft = 30; // รีเซ็ตเวลา
+  updateTimerDisplay(); // แสดงเวลาเริ่มต้น
+
+  timerId = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+
+    // เมื่อหมดเวลา
+    if (timeLeft <= 0) {
+      clearInterval(timerId);
+      endGameByTimeout();
+    }
+  }, 1000);
+}
+// แสดงเวลาบนหน้าเว็บ
+function updateTimerDisplay() {
+  document.getElementById(
+    "timerContainer"
+  ).textContent = `เวลาที่เหลือ: ${timeLeft} วินาที`;
+}
+// จบเกมเมื่อหมดเวลา
+function endGameByTimeout() {
+  document.getElementById("resultContainer").innerHTML = `
+    <div class="alert alert-danger">วร้ายยยย ไม่ทันอะดิ</div>
+  `;
+
+  // ปิด input ไม่ให้ทายต่อ
+  document.getElementById("guessInput").disabled = true;
+}
