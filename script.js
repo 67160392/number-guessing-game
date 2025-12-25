@@ -24,6 +24,7 @@ function checkGuess() {
  `;
     return;
   }
+
   // Validation: ตรวจสอบว่าอยู่ในช่วง 1-100 หรือไม่
   if (guessValue < 1 || guessValue > 100) {
     resultContainer.innerHTML = `
